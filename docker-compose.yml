@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    image: motusserver1:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - motus-network
+
+  app2:
+    image: motusserver2:latest
+    ports:
+      - "3003:3003"
+    networks:
+      - motus-network
+
+  haproxy:
+    image: haproxy:latest
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "3001:3001"
+    networks:
+      - motus-network
+    depends_on:
+      - app
+      - app2
+
+networks:
+  motus-network:
+    driver: bridge
