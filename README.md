@@ -1,5 +1,5 @@
-Simple Motus Game Project
-Project Overview
+## Simple Motus Game Project
+#Project Overview
 
 The Simple Motus Game is a web-based word guessing game, similar to the classic game show format. Players are tasked with guessing a "word of the day" by submitting their guesses and receiving feedback on each letter's correctness. The feedback is categorized into three classes:
 
@@ -13,13 +13,13 @@ Technical Instructions on How to Run the Project
 To get the Simple Motus Game up and running, follow these steps:
 Prerequisites
 
-The following installations are needed:
+# The following installations are needed:
 
     Docker and Docker Compose
     Node.js (the project uses version 20.11)
     A Redis server (included in the docker-compose file)
 
-Running the Project
+# Running the Project
 
     Build the Docker Images: Navigate to the project directory and run::
 
@@ -34,7 +34,7 @@ Running the Project
     Start the Services: After building, the Docker Compose command will start the services defined in the YAML files.
 
     Access the Application: Once the services are up, access the game via http://localhost:3000 and the authentication service at http://localhost:3001.
-Starting the Services:
+# Starting the Services:
 
     For the authentication service: 
      npm start
@@ -46,7 +46,7 @@ Redis:
     Make sure Redis is running and accessible at redis://127.0.0.1:6379.
 
     
-PERTINENT QUESTIONS
+# PERTINENT QUESTIONS
 
     Which server are we going to use?
     We are using a Node.js express server for both the game logic and the authentication service.
