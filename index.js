@@ -5,10 +5,56 @@ const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const os = require('os'); 
+const axios = require('axios');
 
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const session = require('express-session');
+
+app.use(session({
+  secret: 'momo',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: !true } 
+}));
+
+const bcrypt = require('bcrypt');
+app.get('/login', checkAuthentication, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.post('/login', (req, res) => {
+  axios.post('http://localhost:3001/login', req.body)
+    .then(authResponse => {
+      // Set user info in local session
+      req.session.user = { login: req.body.login };
+      res.redirect('/'); // Redirect to game main page
+    })
+    .catch(error => {
+      res.status(400).send('Login failed: invalid username or password');
+    });
+});
+function checkAuthentication(req, res, next) {
+  if (req.session.user) {
+    return res.redirect('/'); // Redirect to main page if already logged in
+  }
+  next();
+}
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+app.post('/register', (req, res) => {
+  axios.post('http://localhost:3001/register', req.body)
+    .then(authResponse => {
+      res.redirect('/login'); // Redirect to the login page
+    })
+    .catch(error => {
+      res.status(400).send('Registration failed: username already exists');
+    });
+});
 
 
 app.get('/', (req, res) => {
