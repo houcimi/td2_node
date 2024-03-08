@@ -7,9 +7,10 @@ const app = express();
 const port = 3001; // Different from the Game App
 
 const redisClient = Redis.createClient({
-    url: 'redis://localhost:6379', // Default URL, change if different
-    legacyMode: true
+    url: 'redis://127.0.0.1:6379',
   });
+  redisClient.connect().catch(err => console.error('Redis connect error', err));
+
 const redisStore =  new RedisStore({
     client: redisClient,
     prefix: "myapp:",
@@ -41,18 +42,24 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { login, password } = req.body;
+    const { login, password } = req.body;
+    console.log("Login attempt for: ", login);
 
-  // Retrieve user from Redis
-  const passwordHash = await redisClient.hGet('users', login);
-  if (passwordHash && await bcrypt.compare(password, passwordHash)) {
-    // Create session
-    req.session.user = { login };
-    res.send('Logged in successfully');
-  } else {
-    res.status(400).send('Invalid login or password');
-  }
+    // Retrieve user's password hash from Redis
+    const passwordHash = await redisClient.hGet('users',login);
+    console.log("Retrieved hash: ", passwordHash);
+
+    if (passwordHash) {
+        const match = await bcrypt.compare(password, passwordHash);
+        if (match) {
+            // Create session
+            req.session.user = { login };
+            return res.send('Logged in successfully');
+        }
+    }
+    return res.status(400).send('Invalid login or password');
 });
+
 
 app.listen(port, () => {
   console.log(`Auth App listening at http://localhost:${port}`);
